@@ -18,14 +18,10 @@
 #include <sys/wait.h>
 #include <sys/file.h>
 
-//#define KVM
-#ifndef KVM
-#define THREADS 64
-#define SIZE (3UL*1024*1024*1024)
-#else
-#define THREADS 4
-#define SIZE (200*1024*1024)
-#endif
+THREADS_VAL
+NDMASK1
+NDMASK2
+#define SIZE (3UL*1024*1024*1024) 
 //#define THREAD_ALLOC
 #ifdef THREAD_ALLOC
 #define THREAD_SIZE (SIZE/THREADS)
@@ -43,14 +39,10 @@ void *thread(void * arg)
 {
 	char *p = arg;
 	int i;
-#ifndef KVM
 #ifndef THREAD_ALLOC
 	int nr = 50;
 #else
 	int nr = 1000;
-#endif
-#else
-	int nr = 500;
 #endif
 #ifdef NO_BIND_FORCE_SAME_NODE
 	if (set_mempolicy(MPOL_BIND, &nodemask_global, 3) < 0)
@@ -63,11 +55,7 @@ void *thread(void * arg)
 		perror("set_mempolicy"), exit(1);
 #endif
 	for (i = 0; i < nr; i++) {
-#if 1
 		bzero(p, THREAD_SIZE);
-#else
-		memcpy(p, p+THREAD_SIZE/2, THREAD_SIZE/2);
-#endif
 		asm volatile("" : : : "memory");
 	}
 	return NULL;
@@ -98,27 +86,15 @@ int main()
 		perror("malloc"), exit(1);
 	CPU_ZERO(&cpumask);
 	if (!pid) {
-		nodemask = 0x0f;
-		for (i = 0; i < 32; i++)
-			CPU_SET(i, &cpumask);
-		for (i = 64; i < 96; i++)
-			CPU_SET(i, &cpumask);
+		FIRST_HALF
 	} else {
-		nodemask = 0xf0;
-		for (i = 32; i < 64; i++)
-			CPU_SET(i, &cpumask);
-		for (i = 96; i < 128; i++)
-			CPU_SET(i, &cpumask);
+		SECOND_HALF
 	}
 #ifdef INVERSE_BIND
-	if (nodemask == 0xf0)
-		nodemask = 0x0f;
-	else if (nodemask == 0x0f)
-		nodemask = 0xf0;
-#endif
-#if 0
-	if (pid)
-		goto skip;
+	if (nodemask == NODEMASK1) 
+		nodemask = NODEMASK2;
+	else if (nodemask == NODEMASK1)
+		nodemask = NODEMASK2;
 #endif
 #ifdef HARD_BIND
 	if (sched_setaffinity(0, sizeof(cpumask), &cpumask) < 0)
@@ -127,9 +103,6 @@ int main()
 #ifdef HARD_BIND
 	if (set_mempolicy(MPOL_BIND, &nodemask, 9) < 0)
 		perror("set_mempolicy"), printf("%lu\n", nodemask), exit(1);
-#endif
-#if 0
-	bzero(p, SIZE);
 #endif
 	for (i = 0; i < THREADS; i++) {
 		char *_p = p;
@@ -142,9 +115,6 @@ int main()
 	for (i = 0; i < THREADS; i++)
 		if (pthread_join(pthread[i], NULL) != 0)
 			perror("pthread_join"), exit(1);
-#if 1
-skip:
-#endif
 	if (pid)
 		if (wait(NULL) < 0)
 			perror("wait"), exit(1);
