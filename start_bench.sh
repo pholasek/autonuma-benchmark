@@ -25,6 +25,7 @@ parse_numa()
 
 run_test()
 {
+	#TODO add more
 	make
 	echo "numa01"
 	/usr/bin/time -f"%e" ./numa01

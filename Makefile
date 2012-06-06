@@ -14,4 +14,4 @@ numa02: numa02.prep.c
 	$(CC) $< $(CFLAGS) -o $@
 	$(CC) $< $(CFLAGS) -DSMT -o numa02_SMT
 clean: 
-	numa01 numa02 numa01_* numa02_* numa01.prep.c numa02.prep.c
+	rm -f numa01 numa02 numa01_* numa02_* numa01.prep.c numa02.prep.c
