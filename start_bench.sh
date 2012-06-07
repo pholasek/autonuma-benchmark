@@ -15,8 +15,6 @@
 
 parse_numa() 
 {
-	# use gawk
-	# TODO
 	#cat numactl_hw.tpl | gawk -v file="numa01.c" -f preproc.awk > numa01.prep.c
 	#cat numactl_hw.tpl | gawk -v file="numa02.c" -f preproc.awk > numa02.prep.c
 	numactl --hardware | gawk -v file="numa01.c" -f preproc.awk > numa01.prep.c
@@ -25,19 +23,30 @@ parse_numa()
 
 run_test()
 {
-	#TODO add more
 	make
 	echo "numa01"
+	./plot.sh numa01 &
+	PLOT_PID=$!
 	/usr/bin/time -f"%e" ./numa01
+	kill -s SIGTERM $PLOT_PID
 	if [ $TALLOC -eq 1 ] ; then
 		echo "numa01_THREAD_ALLOC"
+		./plot.sh numa01_THREAD_ALLOC &
+		PLOT_PID=$!
 		/usr/bin/time -f"%e" ./numa01_THREAD_ALLOC
+		kill -s SIGTERM $PLOT_PID
 	fi
 	echo "numa02"
+	./plot.sh numa02 &
+	PLOT_PID=$!
 	/usr/bin/time -f"%e" ./numa02 
+	kill -s SIGTERM $PLOT_PID
 	if [ $SMT -eq 1 ] ; then
 		echo "numa02_SMT"
+		./plot.sh numa02_SMT &
+		PLOT_PID=$!
 		/usr/bin/time -f"%e" ./numa02_SMT
+		kill -s SIGTERM $PLOT_PID
 	fi
 }
 
@@ -48,7 +57,6 @@ cleanup()
 
 SMT=0
 TALLOC=0
-# TODO add more
 
 while getopts "st" opt; do
 	case $opt in
