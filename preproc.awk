@@ -87,7 +87,7 @@ BEGIN \
 
 END \
 {
-	threads = "#define THREADS "(cpus + 1)
+	threads = "#define THREADS "((cpus + 1) / 2)
 	ncpus = "#define NCPUS "(cpus + 1)
 	nnodes = "#define NNODES "(nodes)
 	if (file == "numa01.c")

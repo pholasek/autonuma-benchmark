@@ -8,6 +8,16 @@
 #
 #  Tool for AutoNUMA benchmarking scripts
 #
+#  Requirements: numactl-devel, gnuplot
+#
+
+usage()
+{
+	echo -e "./start_bench.sh [-sth]"
+	echo -e "\t-s : run numa02_SMT test additionally"
+	echo -e "\t-t : run numa01_THREAD_ALLOC test additionally"
+	echo -e "\t-h : this help"
+}
 
 parse_numa() 
 {
@@ -18,7 +28,7 @@ parse_numa()
 run_test()
 {
 	echo "$TESTNAME"
-	./plot.sh $TESTNAME &
+	nice -n -20 ./plot.sh $TESTNAME &
 	PLOT_PID=$!
 	/usr/bin/time -f"%e" ./$TESTNAME
 	kill -s SIGTERM $PLOT_PID
@@ -50,7 +60,7 @@ cleanup()
 SMT=0
 TALLOC=0
 
-while getopts "st" opt; do
+while getopts "sth" opt; do
 	case $opt in
 		s)
 			SMT=1
@@ -58,8 +68,13 @@ while getopts "st" opt; do
 		t)
 			TALLOC=1
 			;;
+		h)
+			usage
+			exit 0
+			;;
 		\?)
 			echo "Wrong argument $opt"
+			usage
 			exit 1
 			;;
 	esac

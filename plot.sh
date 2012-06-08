@@ -9,8 +9,6 @@
 #  Tool for AutoNUMA benchmarking scripts
 #
 
-set -x
-
 cleanup()
 {
 	exit 0
@@ -20,18 +18,19 @@ trap cleanup SIGTERM
 
 rm -f $1.txt
 touch $1.txt
-PERIOD=3
-TIME=0
+PERIOD=1
+BEGINTIME=`date +%s`
 
 while :
 do
-	pidof $1
+	pidof $1 > /dev/null
 	[ $? == 0 ] && break;
 done
 
 while :
 do
+	TIME=`date +%s`
+	TIME=$(($TIME-$BEGINTIME))
 	./nmstat -v `pidof $1` | awk -v t=$TIME '/total/ {for(i=2;i<=NF;i++) {sum[i]+=$i}} END {printf "%d ",t; for(i=2;i<=NF;i++) {printf "%.2f ",sum[i]} print ""}' >> $1.txt
-	TIME=$(($TIME+$PERIOD))
 	sleep $PERIOD
 done
