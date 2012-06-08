@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #
 #  Copyright (C) 2012  Red Hat, Inc.
 #
@@ -7,46 +9,36 @@
 #  Tool for AutoNUMA benchmarking scripts
 #
 
-
-#!/bin/bash
-
-# TODO plotting
-# per-node memory use = use nmstat.c from Bill Gray
-
 parse_numa() 
 {
-	#cat numactl_hw.tpl | gawk -v file="numa01.c" -f preproc.awk > numa01.prep.c
-	#cat numactl_hw.tpl | gawk -v file="numa02.c" -f preproc.awk > numa02.prep.c
 	numactl --hardware | gawk -v file="numa01.c" -f preproc.awk > numa01.prep.c
 	numactl --hardware | gawk -v file="numa02.c" -f preproc.awk > numa02.prep.c
 }
 
 run_test()
 {
+	echo "$TESTNAME"
+	./plot.sh $TESTNAME &
+	PLOT_PID=$!
+	/usr/bin/time -f"%e" ./$TESTNAME
+	kill -s SIGTERM $PLOT_PID
+	gawk -f genplot.awk $TESTNAME.txt | gnuplot
+}
+
+run_bench()
+{
 	make
-	echo "numa01"
-	./plot.sh numa01 &
-	PLOT_PID=$!
-	/usr/bin/time -f"%e" ./numa01
-	kill -s SIGTERM $PLOT_PID
+	TESTNAME=numa01
+	run_test
 	if [ $TALLOC -eq 1 ] ; then
-		echo "numa01_THREAD_ALLOC"
-		./plot.sh numa01_THREAD_ALLOC &
-		PLOT_PID=$!
-		/usr/bin/time -f"%e" ./numa01_THREAD_ALLOC
-		kill -s SIGTERM $PLOT_PID
+		TESTNAME=numa01_THREAD_ALLOC
+		run_test
 	fi
-	echo "numa02"
-	./plot.sh numa02 &
-	PLOT_PID=$!
-	/usr/bin/time -f"%e" ./numa02 
-	kill -s SIGTERM $PLOT_PID
+	TESTNAME=numa02
+	run_test
 	if [ $SMT -eq 1 ] ; then
-		echo "numa02_SMT"
-		./plot.sh numa02_SMT &
-		PLOT_PID=$!
-		/usr/bin/time -f"%e" ./numa02_SMT
-		kill -s SIGTERM $PLOT_PID
+		TESTNAME=numa02_SMT
+		run_test
 	fi
 }
 
@@ -73,6 +65,6 @@ while getopts "st" opt; do
 	esac
 done
 
-parse_numa
-run_test
 cleanup
+parse_numa
+run_bench

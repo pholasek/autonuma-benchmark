@@ -1,5 +1,14 @@
 #!/bin/awk
 
+#
+#  Copyright (C) 2012  Red Hat, Inc.
+#
+#  This work is licensed under the terms of the GNU GPL, version 2. See
+#  the COPYING file in the top-level directory.
+#
+#  Tool for AutoNUMA benchmarking scripts
+#
+
 # TODO 
 #	sparse numbering of nodes 
 

@@ -1,6 +1,11 @@
 #
-# numa benchmarks Makefile
+#  Copyright (C) 2012  Red Hat, Inc.
 #
+#  This work is licensed under the terms of the GNU GPL, version 2. See
+#  the COPYING file in the top-level directory.
+# 
+#  Tool for AutoNUMA benchmarking scripts
+#  
 
 CC=gcc
 CFLAGS=-O2 -lnuma -pthread
@@ -16,4 +21,4 @@ numa02: numa02.prep.c
 nmstat: nmstat.c
 	$(CC) $< -std=gnu99 -o $@
 clean: 
-	rm -f numa01 numa02 numa01_* numa02_* numa01.prep.c numa02.prep.c nmstat
+	rm -f numa01 numa02 numa01_* numa02_* numa01.prep.c numa02.prep.c nmstat *.txt *.pdf 
