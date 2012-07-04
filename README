@@ -1,0 +1,18 @@
+Couple of scripts for automated benchmarking by numa01 and numa02 programs.
+Requires: numactl-devel, run as root
+Recommended: gnuplot (for visualizations)
+
+Run ./start_bench -h for help or ./start_bench -A for all available tests.
+
+./start_bench.sh [-stnbiA] [-h]
+	-s : run numa02_SMT test additionally
+	-t : run numa01_THREAD_ALLOC test additionally
+	-n : run numa01_NO_BIND_FORCE_SAME_NODE test additionally
+	-b : run {numa01,numa02}_HARD_BIND tests additionally
+	-i : run {numa01,numa02}_INVERSE_BIND tests additionally
+	-A : run all available tests
+	-h : this help
+
+Authors: 
+	Andrea Arcangeli <aarcange@redhat.com> - benchmarks and AutoNUMA
+	Petr Holasek <pholasek@redhat.com> - wrapper scripts
