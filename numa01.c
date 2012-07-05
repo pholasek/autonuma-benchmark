@@ -91,7 +91,7 @@ int main()
 		SECOND_HALF
 	}
 #ifdef INVERSE_BIND
-	if (nodemask == NODEMASK1) 
+	if (nodemask == NODEMASK1)
 		nodemask = NODEMASK2;
 	else if (nodemask == NODEMASK1)
 		nodemask = NODEMASK2;

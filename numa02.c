@@ -17,8 +17,8 @@
 #include <sys/wait.h>
 #include <sys/file.h>
 
-CPUNUM 
-NODENUM 
+CPUNUM
+NODENUM
 #ifndef SMT
 #define THREADS NCPUS
 #else
