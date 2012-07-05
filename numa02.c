@@ -78,9 +78,9 @@ int main()
 	for (i = 0; i < THREADS; i++) {
 		char *_p = p + THREAD_SIZE * i;
 #ifdef INVERSE_BIND
-		bind((THREADS - 1 - i) / NCPUS/NNODES);
+		bind((THREADS - 1 - i) / (THREADS/NNODES));
 #else
-		bind(i / NCPUS/NNODES);
+		bind(i / (THREADS/NNODES));
 #endif
 		if (pthread_create(&pthread[i], NULL, thread, _p) != 0)
 			perror("pthread_create"), exit(1);
