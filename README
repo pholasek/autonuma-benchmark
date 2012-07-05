@@ -7,7 +7,6 @@ Run ./start_bench -h for help or ./start_bench -A for all available tests.
 ./start_bench.sh [-stnbiA] [-h]
 	-s : run numa02_SMT test additionally
 	-t : run numa01_THREAD_ALLOC test additionally
-	-n : run numa01_NO_BIND_FORCE_SAME_NODE test additionally
 	-b : run *_HARD_BIND tests additionally
 	-i : run *_INVERSE_BIND tests additionally
 	-A : run all available tests
