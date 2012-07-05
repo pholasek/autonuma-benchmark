@@ -22,7 +22,7 @@ NODENUM
 #ifndef SMT
 #define THREADS NCPUS
 #else
-#define THREADS NCPUS/2
+#define THREADS (NCPUS/2)
 #endif
 #define SIZE (1UL*1024*1024*1024)
 #define TOTALSIZE (4UL*1024*1024*1024*200)
