@@ -17,8 +17,8 @@ usage()
 	echo -e "\t-s : run numa02_SMT test additionally"
 	echo -e "\t-t : run numa01_THREAD_ALLOC test additionally"
 	echo -e "\t-n : run numa01_NO_BIND_FORCE_SAME_NODE test additionally"
-	echo -e "\t-b : run {numa01,numa02}_HARD_BIND tests additionally"
-	echo -e "\t-i : run {numa01,numa02}_INVERSE_BIND tests additionally"
+	echo -e "\t-b : run *_HARD_BIND tests additionally"
+	echo -e "\t-i : run *_INVERSE_BIND tests additionally"
 	echo -e "\t-A : run all available tests"
 	echo -e "\t-h : this help"
 }
@@ -29,7 +29,7 @@ parse_numa()
 	numactl --hardware | gawk -v file="numa02.c" -f preproc.awk > numa02.prep.c
 }
 
-run_test()
+do_run_test()
 {
 	echo "$TESTNAME"
 	nice -n -20 ./plot.sh $TESTNAME &
@@ -39,39 +39,37 @@ run_test()
 	gawk -f genplot.awk $TESTNAME.txt | gnuplot
 }
 
+run_test()
+{
+	do_run_test
+	ORIG_TESTNAME=$TESTNAME
+	if [ $HARDBIND -eq 1 ] ; then
+		TESTNAME="$ORIG_TESTNAME"_HARD_BIND
+		do_run_test
+	fi
+	if [ $INVERSEBIND -eq 1 ] ; then
+		TESTNAME="$ORIG_TESTNAME"_INVERSE_BIND
+		do_run_test
+	fi
+}
+
 run_bench()
 {
 	make
 	TESTNAME=numa01
 	run_test
-	if [ $TALLOC -eq 1 ] ; then
-		TESTNAME=numa01_THREAD_ALLOC
-		run_test
-	fi
 	if [ $NBFSN -eq 1 ] ; then
 		TESTNAME=numa01_NO_BIND_FORCE_SAME_NODE
-		run_test
+		do_run_test
 	fi
-	if [ $HARDBIND -eq 1 ] ; then
-		TESTNAME=numa01_HARD_BIND
-		run_test
-	fi
-	if [ $INVERSEBIND -eq 1 ] ; then
-		TESTNAME=numa01_INVERSE_BIND
+	if [ $TALLOC -eq 1 ] ; then
+		TESTNAME=numa01_THREAD_ALLOC
 		run_test
 	fi
 	TESTNAME=numa02
 	run_test
 	if [ $SMT -eq 1 ] ; then
 		TESTNAME=numa02_SMT
-		run_test
-	fi
-	if [ $HARDBIND -eq 1 ] ; then
-		TESTNAME=numa02_HARD_BIND
-		run_test
-	fi
-	if [ $INVERSEBIND -eq 1 ] ; then
-		TESTNAME=numa02_INVERSE_BIND
 		run_test
 	fi
 }
