@@ -36,6 +36,17 @@ test_numa()
 	fi
 }
 
+test_ht()
+{
+	SIBLINGS=`grep -m 1 'siblings' /proc/cpuinfo | cut -f2 -d':'`
+	CORES=`grep -m 1 'cpu cores' /proc/cpuinfo | cut -f2 -d':'`
+	if [ $SIBLINGS -eq $CORES ] ; then
+		echo "Hyper-Threading IS NOT enabled."
+	else
+		echo "Hyper-Threading IS enabled."
+	fi
+}
+
 parse_numa() 
 {
 	numactl --hardware | gawk -v file="numa01.c" -f preproc.awk > numa01.prep.c
@@ -69,6 +80,7 @@ run_test()
 run_bench()
 {
 	make
+	test_ht
 	TESTNAME=numa01
 	run_test
 	if [ $TALLOC -eq 1 ] ; then
