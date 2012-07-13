@@ -92,43 +92,46 @@ END \
 	nnodes = "#define NNODES "(nodes)
 	if (file == "numa01.c")
 		while ( (getline < file) > 0) {
-			switch ($0) {
-				case /THREADS_VAL/:
-					print threads
-					break
-				case /NDMASK1/:
-					print ndmask1
-					break
-				case /NDMASK2/:
-					print ndmask2
-					break
-				case /FIRST_HALF/:
-					print first_h
-					break
-				case /SECOND_HALF/:
-					print second_h
-					break
-				default:
-					print $0
+			if ($0 ~ /THREADS_VAL/) {
+				print threads
+				continue
 			}
+			if ($0 ~ /NDMASK1/) {
+				print ndmask1
+				continue
+			}
+			if ($0 ~ /NDMASK2/) {
+				print ndmask2
+				continue
+			}
+			if ($0 ~ /FIRST_HALF/) {
+				print first_h
+				continue
+			}
+			if ($0 ~ /SECOND_HALF/) {
+				print second_h
+				continue
+			}
+			print $0
 		}
 	else
 		while ( (getline < file) > 0) {
-			switch ($0) {
-				case /CPUNUM/:
-					print ncpus
-					break
-				case /NODENUM/:
-					print nnodes
-					break
-				case /NODEMAP/:
-					print nodemap
-					break
-				case /BINDMAP/:
-					print bindmap
-					break
-				default:
-					print $0
+			if ($0 ~ /CPUNUM/) {
+				print ncpus
+				continue
 			}
+			if ($0 ~ /NODENUM/) {
+				print nnodes
+				continue
+			}
+			if ($0 ~ /NODEMAP/) {
+				print nodemap
+				continue
+			}
+			if ($0 ~ /BINDMAP/) {
+				print bindmap
+				continue
+			}
+			print $0
 		}
 }
