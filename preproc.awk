@@ -77,6 +77,7 @@ BEGIN \
 	nodemap = nodemap"\t\tcase "curr":\n"
 	for (i = 4; i <= NF; i++)
 		nodemap = nodemap"\t\t\tCPU_SET("$i", &cpumask);\n"
+	nodemap = nodemap"\t\t\tbreak;\n"
 	bindmap = bindmap"\tbind("curr");\n\tbzero(p"
 	for (i = 0; i < curr; i++)
 		bindmap = bindmap"+SIZE/"nodes
