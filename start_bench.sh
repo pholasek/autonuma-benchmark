@@ -22,6 +22,20 @@ usage()
 	echo -e "\t-h : this help"
 }
 
+test_numa()
+{
+	NUMNODES=`numactl --hardware | grep available`
+	if [ $? -ne 0 ] ; then
+		echo "Abort: NUMA hardware not detected."
+		exit 1
+	fi
+	NUMNODES=`echo $NUMNODES | cut -f2 -d' '`
+	if [ $NUMNODES -le 1 ] ; then
+		echo "Abort: This machine has less than 2 nodes."
+		exit 1
+	fi
+}
+
 parse_numa() 
 {
 	numactl --hardware | gawk -v file="numa01.c" -f preproc.awk > numa01.prep.c
@@ -111,6 +125,7 @@ while getopts "stnbiAh" opt; do
 	esac
 done
 
+test_numa
 cleanup
 parse_numa
 run_bench
