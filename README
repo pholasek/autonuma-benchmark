@@ -12,6 +12,25 @@ Run ./start_bench -h for help or ./start_bench -A for all available tests.
 	-A : run all available tests
 	-h : this help
 
+NOTE: -b/-i are mostly hardware dependent measurements, so they can be skipped
+if the objective is to compare different automatic NUMA migration solutions.
+
+---
+P=# of processes, T=# of threads per process, M=memory per process
+
+numa01
+M=3GiB P=2, T=nr_cpus/2, all threads share all process memory
+
+numa01_THREAD_ALLOC
+M=3GiB, P=2, T=nr_cpus/2, all threads use per-thread local memory
+
+numa02
+M=1GiB, P=1, T=nr_cpus, all threads use per-thread local memory
+
+numa02_SMT
+M=1GiB, P=1, T=nr_cpus/2, all threads use per-thread local memory
+---
+
 Authors: 
 	Andrea Arcangeli <aarcange@redhat.com> - benchmarks and AutoNUMA
 	Petr Holasek <pholasek@redhat.com> - wrapper scripts
