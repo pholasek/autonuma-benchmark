@@ -88,8 +88,11 @@ BEGIN \
 
 END \
 {
-	threads = "#define THREADS "((cpus + 1) / 2)
-	ncpus = "#define NCPUS "(cpus + 1)
+	cpus += 1
+	if (MoF)
+		cpus = MoF
+	threads = "#define THREADS "(cpus / 2)
+	ncpus = "#define NCPUS "cpus
 	nnodes = "#define NNODES "(nodes)
 	if (file == "numa01.c")
 		while ( (getline < file) > 0) {

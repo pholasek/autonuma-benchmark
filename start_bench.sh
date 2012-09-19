@@ -19,6 +19,7 @@ usage()
 	echo -e "\t-b : run *_HARD_BIND tests additionally"
 	echo -e "\t-i : run *_INVERSE_BIND tests additionally"
 	echo -e "\t-A : run all available tests"
+	echo -e "\t-m : use a minimal number of threads per NUMA"
 	echo -e "\t-h : this help"
 }
 
@@ -34,12 +35,16 @@ test_numa()
 		echo "Abort: This machine has less than 2 nodes."
 		exit 1
 	fi
+	SIBLINGS=`grep -m 1 'siblings' /proc/cpuinfo | cut -f2 -d':'`
+	CORES=`grep -m 1 'cpu cores' /proc/cpuinfo | cut -f2 -d':'`
+	if [ $MOF -ne 0 -a $MOF -le $CORES ]; then
+		MOF=$[MOF*NUMNODES]
+		echo "Migrate on fault test, use $MOF CPUs."
+	fi
 }
 
 test_ht()
 {
-	SIBLINGS=`grep -m 1 'siblings' /proc/cpuinfo | cut -f2 -d':'`
-	CORES=`grep -m 1 'cpu cores' /proc/cpuinfo | cut -f2 -d':'`
 	if [ $SIBLINGS -eq $CORES ] ; then
 		echo "Hyper-Threading IS NOT enabled."
 	else
@@ -49,8 +54,8 @@ test_ht()
 
 parse_numa() 
 {
-	numactl --hardware | gawk -v file="numa01.c" -f preproc.awk > numa01.prep.c
-	numactl --hardware | gawk -v file="numa02.c" -f preproc.awk > numa02.prep.c
+	numactl --hardware | gawk -v MoF=$MOF -v file="numa01.c" -f preproc.awk > numa01.prep.c
+	numactl --hardware | gawk -v MoF=$MOF -v file="numa02.c" -f preproc.awk > numa02.prep.c
 }
 
 do_run_test()
@@ -104,8 +109,9 @@ SMT=0
 TALLOC=0
 HARDBIND=0
 INVERSEBIND=0
+MOF=0
 
-while getopts "stnbiAh" opt; do
+while getopts "stnbiAmh" opt; do
 	case $opt in
 		s)
 			SMT=1
@@ -124,6 +130,9 @@ while getopts "stnbiAh" opt; do
 			TALLOC=1
 			HARDBIND=1
 			INVERSEBIND=1
+			;;
+		m)
+			MOF=2
 			;;
 		h)
 			usage
