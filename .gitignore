@@ -1,0 +1,15 @@
+# Build artifacts
+numa01
+numa02
+nmstat
+numa01_*
+numa02_*
+*.prep.c
+
+# Generated files
+*.txt
+*.pdf
+
+# Temporary files
+*~
+*.tmp
