@@ -82,7 +82,7 @@ BEGIN \
 	for (i = 0; i < curr; i++)
 		bindmap = bindmap"+SIZE/"nodes
 	bindmap = bindmap", SIZE/"nodes");\n"
-	if ($NF > cpus)
+	if (NF > 3 && $NF > cpus)
 		cpus = $NF
 }
 
@@ -91,7 +91,10 @@ END \
 	cpus += 1
 	if (MoF)
 		cpus = MoF
-	threads = "#define THREADS "(cpus / 2)
+	threads_count = int(cpus / 2)
+	if (threads_count < 1)
+		threads_count = 1
+	threads = "#define THREADS "threads_count
 	ncpus = "#define NCPUS "cpus
 	nnodes = "#define NNODES "(nodes)
 	if (file == "numa01.c")
